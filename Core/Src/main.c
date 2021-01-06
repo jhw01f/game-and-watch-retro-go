@@ -52,6 +52,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc2;
 
 DAC_HandleTypeDef hdac1;
 DAC_HandleTypeDef hdac2;
@@ -92,6 +93,7 @@ static void MX_SAI1_Init(void);
 static void MX_RTC_Init(void);
 static void MX_DAC1_Init(void);
 static void MX_DAC2_Init(void);
+static void MX_ADC2_Init(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -365,6 +367,7 @@ int main(void)
   MX_RTC_Init();
   MX_DAC1_Init();
   MX_DAC2_Init();
+  MX_ADC2_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -418,6 +421,8 @@ int main(void)
   if(*ptr == 0x88888888) {
     Error_Handler();
   }
+
+  HAL_ADC_Start(&hadc2);
 
   // Launch the emulator
   app_main();
@@ -493,7 +498,8 @@ void SystemClock_Config(void)
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_LTDC
                               |RCC_PERIPHCLK_SPI2|RCC_PERIPHCLK_SAI1
-                              |RCC_PERIPHCLK_OSPI|RCC_PERIPHCLK_CKPER;
+                              |RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_OSPI
+                              |RCC_PERIPHCLK_CKPER;
   PeriphClkInitStruct.PLL2.PLL2M = 25;
   PeriphClkInitStruct.PLL2.PLL2N = 192;
   PeriphClkInitStruct.PLL2.PLL2P = 5;
@@ -514,6 +520,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.CkperClockSelection = RCC_CLKPSOURCE_HSI;
   PeriphClkInitStruct.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLL2;
   PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_CLKP;
+  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
   PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   PeriphClkInitStruct.TIMPresSelection = RCC_TIMPRES_ACTIVATED;
 
@@ -532,6 +539,63 @@ static void MX_NVIC_Init(void)
   /* OCTOSPI1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(OCTOSPI1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(OCTOSPI1_IRQn);
+}
+
+/**
+  * @brief ADC2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC2_Init(void)
+{
+
+  /* USER CODE BEGIN ADC2_Init 0 */
+
+  /* USER CODE END ADC2_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC2_Init 1 */
+
+  /* USER CODE END ADC2_Init 1 */
+  /** Common config
+  */
+  hadc2.Instance = ADC2;
+  hadc2.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV1;
+  hadc2.Init.Resolution = ADC_RESOLUTION_16B;
+  hadc2.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc2.Init.EOCSelection = DISABLE;
+  hadc2.Init.LowPowerAutoWait = ENABLE;
+  hadc2.Init.ContinuousConvMode = ENABLE;
+  hadc2.Init.NbrOfConversion = 0;
+  hadc2.Init.DiscontinuousConvMode = DISABLE;
+  hadc2.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc2.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc2.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
+  hadc2.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+  hadc2.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
+  hadc2.Init.OversamplingMode = DISABLE;
+  if (HAL_ADC_Init(&hadc2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_4;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  sConfig.SingleDiff = ADC_SINGLE_ENDED;
+  sConfig.OffsetNumber = ADC_OFFSET_NONE;
+  sConfig.Offset = 0;
+  sConfig.OffsetSignedSaturation = DISABLE;
+  if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC2_Init 2 */
+
+  /* USER CODE END ADC2_Init 2 */
+
 }
 
 /**

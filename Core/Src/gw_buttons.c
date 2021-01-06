@@ -5,6 +5,8 @@
 
 #include <stdbool.h>
 
+extern ADC_HandleTypeDef hadc2;
+
 uint32_t buttons_get() {
     bool left = HAL_GPIO_ReadPin(BTN_Left_GPIO_Port, BTN_Left_Pin) == GPIO_PIN_RESET;
     bool right = HAL_GPIO_ReadPin(BTN_Right_GPIO_Port, BTN_Right_Pin) == GPIO_PIN_RESET;
@@ -22,5 +24,14 @@ uint32_t buttons_get() {
         (time << 6) | (game << 7) | (pause << 8) | (power << 9)
     );
 
+
+}
+
+uint32_t battery_voltage_get() {
+
+    
+    HAL_ADC_PollForConversion(&hadc2,10);
+
+    return HAL_ADC_GetValue(&hadc2);
 
 }

@@ -72,11 +72,29 @@ bool odroid_input_key_is_pressed(odroid_gamepad_key_t key)
     return joystick.values[key];
 }
 
+int vBatAverage = 0;
+
 odroid_battery_state_t odroid_input_read_battery()
 {
+    int vBat = battery_voltage_get();
+
+    vBatAverage -= ((vBatAverage - vBat)/10);
+
+    // Conversion offset of 3v
+    int batPercent = vBatAverage - 10200; // subtract 3V
+
+    if (batPercent < 0)
+        batPercent = 0;
+
+    // Conversion multiplier
+    batPercent = batPercent / 40;
+
+    if (batPercent > 100)
+        batPercent = 100;
+
     odroid_battery_state_t ret = {
         .millivolts = 1337,
-        .percentage = 42,
+        .percentage = batPercent,
     };
 
     return ret;

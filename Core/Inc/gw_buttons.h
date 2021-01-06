@@ -16,4 +16,6 @@
 
 uint32_t buttons_get();
 
+uint32_t battery_voltage_get();
+
 #endif
