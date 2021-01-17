@@ -483,7 +483,7 @@ size_t osd_getromdata(unsigned char **data)
 
 uint osd_getromcrc()
 {
-   return 0x1337;
+    return crc32_le(0, ACTIVE_FILE->address + 16, ACTIVE_FILE->size - 16);;
 }
 
 void osd_loadstate()
